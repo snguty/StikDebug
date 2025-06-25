@@ -4,20 +4,18 @@ workflows:
     environment:
       xcode: latest
       vars:
-        BUNDLE_ID: "com.yourcompany.stikdebug"
+        BUNDLE_ID: "com.example.stikdebug"
         APP_NAME: "StikDebug"
-        DEVELOPMENT_TEAM: "YOUR_TEAM_ID"
       ios_signing:
         distribution_type: development
         bundle_identifier: $BUNDLE_ID
-        team_id: $DEVELOPMENT_TEAM
     scripts:
-      - name: Clean build
+      - name: Clean previous build
         script: |
           set -ex
           xcodebuild clean -workspace StikDebug.xcworkspace -scheme StikDebug
 
-      - name: Build IPA
+      - name: Build and export IPA
         script: |
           set -ex
           xcodebuild \
