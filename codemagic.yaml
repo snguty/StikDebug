@@ -1,5 +1,5 @@
 workflows:
-  build_stikdebug:
+  stikdebug-ios:
     name: Build StikDebug for iOS 16.7.11
     environment:
       xcode: latest
