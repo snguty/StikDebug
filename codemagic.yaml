@@ -7,11 +7,6 @@ workflows:
         BUNDLE_ID: "com.ahmed.stikdebug"
         APP_NAME: "StikDebug"
     scripts:
-      - name: Clean build
-        script: |
-          set -ex
-          xcodebuild clean -workspace StikDebug.xcworkspace -scheme StikDebug
-
       - name: Build IPA (unsigned)
         script: |
           set -ex
