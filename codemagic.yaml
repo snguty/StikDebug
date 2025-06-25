@@ -10,13 +10,13 @@ workflows:
       - name: Clean build
         script: |
           set -ex
-          xcodebuild clean -project StikDebug.xcodeproj -scheme StikDebug
+          xcodebuild clean -workspace StikDebug.xcworkspace -scheme StikDebug
 
       - name: Build IPA (unsigned)
         script: |
           set -ex
           xcodebuild \
-            -project StikDebug.xcodeproj \
+            -workspace StikDebug.xcworkspace \
             -scheme StikDebug \
             -sdk iphoneos \
             -configuration Release \
