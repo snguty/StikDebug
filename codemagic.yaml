@@ -18,9 +18,12 @@ workflows:
             -archivePath $HOME/build/StikDebug.xcarchive \
             archive | tee xcodebuild.log
 
+          echo "== Check archive output =="
+          ls -la $HOME/build/StikDebug.xcarchive/Products/Applications || echo "❌ App not found."
+
           mkdir -p Payload
-          cp -r $HOME/build/StikDebug.xcarchive/Products/Applications/*.app Payload/
-          zip -r "$APP_NAME.ipa" Payload
+          cp -r $HOME/build/StikDebug.xcarchive/Products/Applications/*.app Payload/ || echo "❌ Copy .app failed"
+          zip -r "$APP_NAME.ipa" Payload || echo "❌ Zipping IPA failed"
           mv "$APP_NAME.ipa" $CM_BUILD_DIR/
 
     artifacts:
