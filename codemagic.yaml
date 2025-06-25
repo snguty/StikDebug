@@ -16,7 +16,7 @@ workflows:
             -sdk iphoneos \
             -configuration Release \
             -archivePath $HOME/build/StikDebug.xcarchive \
-            archive
+            archive | tee xcodebuild.log
 
           mkdir -p Payload
           cp -r $HOME/build/StikDebug.xcarchive/Products/Applications/*.app Payload/
@@ -25,4 +25,5 @@ workflows:
 
     artifacts:
       - "*.ipa"
+      - "xcodebuild.log"
       - "$HOME/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog"
