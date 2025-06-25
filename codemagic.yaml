@@ -30,11 +30,4 @@ workflows:
 
           echo "== Zipping IPA =="
           zip -r "$APP_NAME.ipa" Payload || echo "❌ Failed to zip IPA"
-          mv "$APP_NAME.ipa" $CM_BUILD_DIR/ || echo "❌ Failed to move IPA to artifacts"
-
-    artifacts:
-      - "*.ipa"
-      - "xcodebuild.log"
-      - "$HOME/build/StikDebug.xcarchive/**/*"
-      - "$HOME/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog"
-``
+          mv "$APP_NAME.ipa"
