@@ -25,9 +25,9 @@ workflows:
 
           mkdir -p Payload
           cp -r $HOME/build/StikDebug.xcarchive/Products/Applications/*.app Payload/
-          zip -r $APP_NAME.ipa Payload
-          mv $APP_NAME.ipa $CM_BUILD_DIR/
+          zip -r "$APP_NAME.ipa" Payload
+          mv "$APP_NAME.ipa" $CM_BUILD_DIR/
 
     artifacts:
-      - *.ipa
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog
+      - "*.ipa"
+      - "$HOME/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog"
