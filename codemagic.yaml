@@ -1,0 +1,18 @@
+workflows:
+  stikdebug-ios:
+    name: Build StikDebug for iOS 16.7.11
+    environment:
+      xcode: latest
+    scripts:
+      - name: Build IPA
+        script: |
+          xcodebuild -scheme StikDebug \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     -archivePath $CM_BUILD_DIR/StikDebug.xcarchive archive
+          xcodebuild -exportArchive \
+                     -archivePath $CM_BUILD_DIR/StikDebug.xcarchive \
+                     -exportPath $CM_BUILD_DIR/IPA \
+                     -exportOptionsPlist ExportOptions.plist
+    artifacts:
+      - IPA/*.ipa
