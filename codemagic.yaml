@@ -1,15 +1,17 @@
 workflows:
   stikdebug-ios:
-    name: Build Unsigned StikDebug IPA
+    name: Build Unsigned StikDebug IPA (with full diagnostics)
     environment:
       xcode: latest
       vars:
         BUNDLE_ID: "com.ahmed.stikdebug"
         APP_NAME: "StikDebug"
     scripts:
-      - name: Build IPA (unsigned)
+      - name: Archive and Inspect
         script: |
           set -ex
+
+          echo "== Starting archive phase =="
           xcodebuild \
             -workspace StikDebug.xcworkspace \
             -scheme StikDebug \
@@ -18,15 +20,21 @@ workflows:
             -archivePath $HOME/build/StikDebug.xcarchive \
             archive | tee xcodebuild.log
 
-          echo "== Check archive output =="
-          ls -la $HOME/build/StikDebug.xcarchive/Products/Applications || echo "❌ App not found."
+          echo "== Archive finished. Checking .xcarchive contents =="
+          ls -la $HOME/build/StikDebug.xcarchive || echo "❌ .xcarchive not found"
+          ls -la $HOME/build/StikDebug.xcarchive/Products/Applications || echo "❌ .app not found"
 
+          echo "== Proceeding to IPA packaging =="
           mkdir -p Payload
-          cp -r $HOME/build/StikDebug.xcarchive/Products/Applications/*.app Payload/ || echo "❌ Copy .app failed"
-          zip -r "$APP_NAME.ipa" Payload || echo "❌ Zipping IPA failed"
-          mv "$APP_NAME.ipa" $CM_BUILD_DIR/
+          cp -r $HOME/build/StikDebug.xcarchive/Products/Applications/*.app Payload/ || echo "❌ Failed to copy .app to Payload"
+
+          echo "== Zipping IPA =="
+          zip -r "$APP_NAME.ipa" Payload || echo "❌ Failed to zip IPA"
+          mv "$APP_NAME.ipa" $CM_BUILD_DIR/ || echo "❌ Failed to move IPA to artifacts"
 
     artifacts:
       - "*.ipa"
       - "xcodebuild.log"
+      - "$HOME/build/StikDebug.xcarchive/**/*"
       - "$HOME/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog"
+``
