@@ -1,21 +1,18 @@
 workflows:
-  stikdebug-ios:
-    name: Build StikDebug for iOS 16.7.11
+  stikdebug-unsigned:
+    name: Build Unsigned StikDebug IPA
     environment:
       xcode: latest
       vars:
-        BUNDLE_ID: "com.example.stikdebug"
+        BUNDLE_ID: "com.ahmed.stikdebug"
         APP_NAME: "StikDebug"
-      ios_signing:
-        distribution_type: development
-        bundle_identifier: $BUNDLE_ID
     scripts:
-      - name: Clean previous build
+      - name: Clean build
         script: |
           set -ex
           xcodebuild clean -workspace StikDebug.xcworkspace -scheme StikDebug
 
-      - name: Build and export IPA
+      - name: Build IPA (unsigned)
         script: |
           set -ex
           xcodebuild \
@@ -26,12 +23,11 @@ workflows:
             -archivePath $HOME/build/StikDebug.xcarchive \
             archive
 
-          xcodebuild -exportArchive \
-            -archivePath $HOME/build/StikDebug.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath $HOME/build/IPA
+          mkdir -p Payload
+          cp -r $HOME/build/StikDebug.xcarchive/Products/Applications/*.app Payload/
+          zip -r $APP_NAME.ipa Payload
+          mv $APP_NAME.ipa $CM_BUILD_DIR/
 
     artifacts:
-      - build/IPA/*.ipa
+      - *.ipa
       - $HOME/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog
-      - ExportOptions.plist
