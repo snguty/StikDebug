@@ -1,6 +1,6 @@
 workflows:
   stikdebug-ios:
-    name: Build Unsigned StikDebug IPA (final diagnostic build)
+    name: Build Unsigned StikDebug IPA (Final Diagnostic Build)
     environment:
       xcode: latest
       vars:
@@ -11,12 +11,11 @@ workflows:
         script: |
           set -ex
 
-          export APP_NAME=${APP_NAME:-"StikDebug"}
           export ARCHIVE_PATH="$HOME/build/$APP_NAME.xcarchive"
           export IPA_PATH="$CM_BUILD_DIR/$APP_NAME.ipa"
           export APP_BUNDLE="$ARCHIVE_PATH/Products/Applications/$APP_NAME.app"
 
-          echo "== Starting archive phase at $(date) =="
+          echo "== Archiving with xcodebuild at $(date) =="
           xcodebuild \
             -workspace "$APP_NAME.xcworkspace" \
             -scheme "$APP_NAME" \
@@ -34,7 +33,7 @@ workflows:
             exit 1
           fi
 
-          echo "== Verifying .app contents =="
+          echo "== Verifying executable inside .app =="
           if [ ! -f "$APP_BUNDLE/$APP_NAME" ]; then
             echo "❌ Executable $APP_NAME not found inside .app bundle"
             ls -l "$APP_BUNDLE"
@@ -48,7 +47,7 @@ workflows:
             exit 1
           }
 
-          echo "== Zipping into IPA =="
+          echo "== Zipping into IPA file =="
           zip -r "$APP_NAME.ipa" Payload
           mv "$APP_NAME.ipa" "$CM_BUILD_DIR/" || {
             echo "❌ Failed to move IPA"
@@ -58,15 +57,15 @@ workflows:
           echo "== Cleaning up Payload =="
           rm -rf Payload
 
-          echo "== Checking IPA size =="
+          echo "== Checking final IPA size =="
           IPA_SIZE_KB=$(du -k "$IPA_PATH" | cut -f1)
-          echo "IPA size: ${IPA_SIZE_KB} KB"
+          echo "📦 IPA size: ${IPA_SIZE_KB} KB"
           if [ "$IPA_SIZE_KB" -lt 1000 ]; then
-            echo "❌ IPA size too small. Something went wrong during packaging."
+            echo "❌ IPA size too small — likely incomplete content"
             exit 1
           fi
 
-          echo "✅ Build completed successfully at $(date)"
+          echo "✅ Build and verification completed at $(date)"
 
     artifacts:
       - "*.ipa"
