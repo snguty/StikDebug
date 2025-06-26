@@ -1,6 +1,6 @@
 workflows:
   stikdebug-ios:
-    name: Build Unsigned StikDebug IPA (with full diagnostics)
+    name: Build Unsigned StikDebug IPA (final diagnostic build)
     environment:
       xcode: latest
       vars:
@@ -30,4 +30,10 @@ workflows:
 
           echo "== Zipping IPA =="
           zip -r "$APP_NAME.ipa" Payload || echo "❌ Failed to zip IPA"
-          mv "$APP_NAME.ipa"
+          mv "$APP_NAME.ipa" $CM_BUILD_DIR/ || echo "❌ Failed to move IPA to artifacts"
+
+    artifacts:
+      - "*.ipa"
+      - "xcodebuild.log"
+      - "$HOME/build/StikDebug.xcarchive/**/*"
+      - "$HOME/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog"
