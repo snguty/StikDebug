@@ -1,67 +1,8 @@
-workflows:
-  stikdebug-ios:
-    name: Build Unsigned StikDebug IPA (final diagnostic build)
-    environment:
-      xcode: latest
-      vars:
-        BUNDLE_ID: "com.ahmed.stikdebug"
-        APP_NAME: "StikDebug"
-    scripts:
-      - name: Archive and Package Unsigned IPA
-        script: |
-          set -ex
+echo "== Verifying contents of the .app bundle =="
+APP_BUNDLE="$ARCHIVE_PATH/Products/Applications/$APP_NAME.app"
 
-          export APP_NAME=${APP_NAME:-"StikDebug"}
-          export ARCHIVE_PATH="$HOME/build/$APP_NAME.xcarchive"
-          export IPA_PATH="$CM_BUILD_DIR/$APP_NAME.ipa"
-
-          echo "== Starting archive phase at $(date) =="
-          xcodebuild \
-            -workspace "$APP_NAME.xcworkspace" \
-            -scheme "$APP_NAME" \
-            -sdk iphoneos \
-            -configuration Release \
-            -archivePath "$ARCHIVE_PATH" \
-            SKIP_INSTALL=NO \
-            BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-            ONLY_ACTIVE_ARCH=NO \
-            archive | tee xcodebuild.log
-
-          echo "== Validating archive contents =="
-          if [ ! -d "$ARCHIVE_PATH/Products/Applications/$APP_NAME.app" ]; then
-            echo "❌ .app not found inside archive — build may have failed"
-            exit 1
-          fi
-
-          echo "== Creating Payload directory =="
-          mkdir -p Payload
-          cp -r "$ARCHIVE_PATH/Products/Applications/$APP_NAME.app" Payload/ || {
-            echo "❌ Failed to copy .app to Payload"
-            exit 1
-          }
-
-          echo "== Zipping into IPA =="
-          zip -r "$APP_NAME.ipa" Payload
-          mv "$APP_NAME.ipa" "$CM_BUILD_DIR/" || {
-            echo "❌ Failed to move IPA"
-            exit 1
-          }
-
-          echo "== Cleaning up Payload =="
-          rm -rf Payload
-
-          echo "== Checking IPA size =="
-          IPA_SIZE_KB=$(du -k "$IPA_PATH" | cut -f1)
-          echo "IPA size: ${IPA_SIZE_KB} KB"
-          if [ "$IPA_SIZE_KB" -lt 1000 ]; then
-            echo "❌ IPA size too small. Something went wrong during packaging."
-            exit 1
-          fi
-
-          echo "✅ Build completed at $(date)"
-
-    artifacts:
-      - "*.ipa"
-      - "xcodebuild.log"
-      - "$HOME/build/$APP_NAME.xcarchive/**/*"
-      - "$HOME/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog"
+if [ ! -f "$APP_BUNDLE/$APP_NAME" ]; then
+  echo "❌ Executable $APP_NAME not found in .app bundle"
+  ls -l "$APP_BUNDLE"
+  exit 1
+fi
